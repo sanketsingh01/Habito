@@ -5,9 +5,11 @@ import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 
 export default function HomeScreen() {
     const [selectedDate, setSelectedDate] = useState(new Date());
+    const router = useRouter();
 
     return (
         <SafeAreaView style={styles.container}>
@@ -45,7 +47,7 @@ export default function HomeScreen() {
             </View>
 
             {/* Add new Habit button */}
-            <Pressable style={styles.addButton}>
+            <Pressable onPressMove={() => router.push("/habit/createHabit")} style={styles.addButton}>
                 <Ionicons name="add" size={24} color="black" />
             </Pressable>
 

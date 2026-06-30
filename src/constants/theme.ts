@@ -139,7 +139,7 @@ export const spacing = {
 
 /** Pill-forward corner radii (rem → px at 16px root) */
 export const borderRadius = {
-  sm: 8,
+  sm: 2,
   default: 16,
   md: 24,
   lg: 32,
