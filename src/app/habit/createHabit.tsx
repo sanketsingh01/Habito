@@ -7,8 +7,18 @@ import { Image, Platform, Pressable, StyleSheet, Text, TextInput, TouchableOpaci
 import { SafeAreaView } from 'react-native-safe-area-context';
 import EmojiPicker from 'rn-emoji-keyboard';
 
+import * as Crypto from 'expo-crypto';
+import { useSQLiteContext } from "expo-sqlite";
+
+/** 0 = Monday ... 6 = Sunday (matches week calendar) */
+function toMondayBasedWeekday(value: Date): number {
+    const sundayBased = value.getDay();
+    return sundayBased === 0 ? 6 : sundayBased - 1;
+}
+
 const createHabit = () => {
     const router = useRouter();
+    const db = useSQLiteContext();
 
     const [isOpen, setIsOpen] = useState(false);
     const [chosenEmoji, setChosenEmoji] = useState('😃');
@@ -34,6 +44,31 @@ const createHabit = () => {
 
     const showDatePicker = () => {
         setShow(true);
+    };
+
+    const handleCreateHabit = async () => {
+        const id = Crypto.randomUUID();
+        const now = new Date().toISOString();
+        const habitGoal = date.toISOString().slice(0, 10);
+        const weeklyDueWeekday =
+            frequency === "weekly" ? toMondayBasedWeekday(new Date()) : null;
+
+        await db.runAsync(
+            `INSERT INTO habits (id, habit_name, habit_emoji, habit_goal, frequency, weekly_due_weekday, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [
+                id,
+                habitName,
+                chosenEmoji,
+                habitGoal,
+                frequency,
+                weeklyDueWeekday,
+                1,
+                now,
+                now,
+            ]
+        );
+
+        router.back();
     };
 
     return (
@@ -142,7 +177,7 @@ const createHabit = () => {
                 </View>
 
                 {/* Create habit button */}
-                <TouchableOpacity style={styles.button} onPress={() => router.back()}>
+                <TouchableOpacity style={styles.button} onPress={handleCreateHabit}>
                     <Text style={styles.buttonText}>Create Goal</Text>
                 </TouchableOpacity>
             </View>

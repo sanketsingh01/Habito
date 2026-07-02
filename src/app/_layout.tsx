@@ -6,6 +6,9 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import { StatusBar } from "react-native";
 
+import { migrateDbIfNeeded } from "@/db/database";
+import { SQLiteProvider } from "expo-sqlite";
+
 
 SplashScreen.preventAutoHideAsync();
 
@@ -25,15 +28,17 @@ export default function RootLayout() {
   return (
     <>
       <StatusBar barStyle={"dark-content"} backgroundColor={colors.background} />
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: colors.background },
-        }}
-      >
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="habit/createHabit" />
-      </Stack>
+      <SQLiteProvider databaseName="habito.db" onInit={migrateDbIfNeeded}>
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            contentStyle: { backgroundColor: colors.background },
+          }}
+        >
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="habit/createHabit" />
+        </Stack>
+      </SQLiteProvider>
     </>
   );
 }
